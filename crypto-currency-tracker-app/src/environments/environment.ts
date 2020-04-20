@@ -3,7 +3,9 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  cryptoCompareBaseUrl: 'https://min-api.cryptocompare.com/data',
+  cryptoCompareApiKey: '4ba051406115f868c4799ba7475c6fe06a1ee2c476836de8745c74207c13d7a8'
 };
 
 /*
