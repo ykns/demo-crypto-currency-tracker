@@ -1,24 +1,36 @@
-  
 @import "~ag-grid-community/src/styles/ag-grid.scss";
-@import "~ag-grid-community/src/styles/ag-theme-balham-dark/sass/ag-theme-balham-dark-mixin.scss";
+@import "~ag-grid-community/src/styles/ag-theme-alpine/sass/ag-theme-alpine-mixin.scss";
+// @import "~ag-grid-community/src/styles/ag-theme-balham-dark/sass/ag-theme-balham-dark-mixin.scss";
 
-@import "~ag-grid-community/src/styles/ag-theme-balham-dark/sass/ag-theme-balham-dark-default-params.scss";
-//node_modules\ag-grid-community\src\styles\ag-theme-balham-dark\sass\_ag-theme-balham-dark-default-params.scss
+.crypto-grid {
+  @include ag-theme-alpine();
+  .ag-cell {
+    display: flex;
+    align-items: center;
+    line-height: unset;
+  }
 
-.ag-theme-balham-dark-custom {
-    @include ag-theme-balham-dark();
-    .ag-cell {
-        display: flex;
-        padding-left: 0px;
-        align-items: center;
+  .ag-header-cell {
+    display: flex;
+  }
+
+  .ag-row {
+    background-color: white;
+    &:hover {
+      background-color: peachpuff;
     }
+  }
 
-    .column-center {
-        justify-content: center;
-    }
+  .cell-center {
+    justify-content: center;
+    margin-top: 3px;
+  }
 
-    .column-left {
-        justify-content: left;
-        margin-left:  9px;
+  .cell-right {
+    flex-flow: row-reverse;
+
+    .ag-header-cell-label {
+      flex-flow: row-reverse;
     }
+  }
 }

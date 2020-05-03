@@ -11,15 +11,21 @@ import { ImageCellComponent } from '../image-cell/image-cell.component';
 export class CryptoGridComponent implements OnInit {
   columnDefs = [
     {
-      headerName: '',
+      headerName: 'No.',
       width: 50,
+      valueGetter: params => params.node.rowIndex + 1,
+      cellClass: 'cell-left'
+    },
+    {
+      headerName: '',
+      width: 80,
       field: 'imageUrl',
-      cellClass: 'cell--image-url',
+      cellClass: 'cell-center',
       cellRendererFramework: ImageCellComponent,
     },
-    { headerName: 'Symbol', field: 'symbol' },
-    { headerName: 'Name', field: 'fullName' },
-    { headerName: 'Price', field: 'price' },
+    { headerName: 'Symbol', field: 'symbol', cellClass: 'cell-left', width: 100, },
+    { headerName: 'Name', field: 'fullName', cellClass: 'cell-left', width: 150 },
+    { headerName: 'Price', headerClass: 'cell-right', field: 'price', cellClass: 'cell-right', valueFormatter: ({ value }) => value.toFixed(2), width: 100 },
   ];
 
   // limit to 20 coins due to max length limit imposed by crypto-compare's API
