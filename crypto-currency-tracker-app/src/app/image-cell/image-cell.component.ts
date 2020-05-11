@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 @Component({
   selector: 'app-image-cell',
   templateUrl: './image-cell.component.html',
-  styleUrls: ['./image-cell.component.sass']
+  styleUrls: ['./image-cell.component.scss']
 })
 export class ImageCellComponent implements ICellRendererAngularComp {
   public imageUrl: Observable<string>;

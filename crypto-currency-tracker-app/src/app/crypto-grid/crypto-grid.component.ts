@@ -6,7 +6,7 @@ import { ImageCellComponent } from '../image-cell/image-cell.component';
 @Component({
   selector: 'app-crypto-grid',
   templateUrl: './crypto-grid.component.html',
-  styleUrls: ['./crypto-grid.component.sass']
+  styleUrls: ['./crypto-grid.component.scss']
 })
 export class CryptoGridComponent implements OnInit {
   columnDefs = [

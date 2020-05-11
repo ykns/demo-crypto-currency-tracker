@@ -1,0 +1,24 @@
+  
+@import "~ag-grid-community/src/styles/ag-grid.scss";
+@import "~ag-grid-community/src/styles/ag-theme-balham-dark/sass/ag-theme-balham-dark-mixin.scss";
+
+@import "~ag-grid-community/src/styles/ag-theme-balham-dark/sass/ag-theme-balham-dark-default-params.scss";
+//node_modules\ag-grid-community\src\styles\ag-theme-balham-dark\sass\_ag-theme-balham-dark-default-params.scss
+
+.ag-theme-balham-dark-custom {
+    @include ag-theme-balham-dark();
+    .ag-cell {
+        display: flex;
+        padding-left: 0px;
+        align-items: center;
+    }
+
+    .column-center {
+        justify-content: center;
+    }
+
+    .column-left {
+        justify-content: left;
+        margin-left:  9px;
+    }
+}
