@@ -5,7 +5,8 @@
 export const environment = {
   production: false,
   cryptoCompareBaseUrl: 'https://min-api.cryptocompare.com/data',
-  cryptoCompareApiKey: '4ba051406115f868c4799ba7475c6fe06a1ee2c476836de8745c74207c13d7a8'
+  cryptoCompareApiKey: '4ba051406115f868c4799ba7475c6fe06a1ee2c476836de8745c74207c13d7a8',
+  cryptoCompareWebSocketUrl: 'wss://streamer.cryptocompare.com/v2'
 };
 
 /*
