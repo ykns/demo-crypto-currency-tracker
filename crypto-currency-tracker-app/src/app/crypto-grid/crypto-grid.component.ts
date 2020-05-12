@@ -14,7 +14,7 @@ export class CryptoGridComponent implements OnInit, OnDestroy {
   columnDefs = [
     {
       headerName: 'No.',
-      width: 50,
+      width: 70,
       valueGetter: params => params.node.rowIndex + 1,
       cellClass: 'cell-left'
     },
@@ -27,7 +27,15 @@ export class CryptoGridComponent implements OnInit, OnDestroy {
     },
     { headerName: 'Symbol', field: 'symbol', cellClass: 'cell-left', width: 100, },
     { headerName: 'Name', field: 'fullName', cellClass: 'cell-left', width: 150 },
-    { headerName: 'Price', headerClass: 'cell-right', field: 'price', cellClass: 'cell-right', valueFormatter: ({ value }) => value.toFixed(2), width: 100 },
+    {
+      headerName: 'Price',
+      headerClass: 'cell-right',
+      field: 'price',
+      cellClass: 'cell-right',
+      width: 180,
+      valueFormatter: ({ value }) => value.toFixed(4),
+      cellRenderer: 'agAnimateShowChangeCellRenderer',
+    },
   ];
 
   private gridOptions;

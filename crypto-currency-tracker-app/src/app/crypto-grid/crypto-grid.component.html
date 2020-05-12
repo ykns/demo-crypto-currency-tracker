@@ -3,12 +3,11 @@
     <select [(ngModel)]="selectedFiatCurrencySymbol" (change)="onSelectFiatCurrencySymbol()">
         <option *ngFor="let fiatCurrencySymbol of fiatCurrencySymbols" value={{fiatCurrencySymbol}}>{{fiatCurrencySymbol}}</option>
     </select>
-    <ag-grid-angular style="width: 1024px; height: 768px;" 
-                    class="crypto-grid" 
-                    rowHeight="60"
-                    [rowData]="cryptoCurrenciesWithPrice"
-                    [columnDefs]="columnDefs"
-                    [animateRows]="true"
-                    [getRowNodeId]="getRowNodeId">              
+    <ag-grid-angular style="width: 600px; height: 768px;" 
+        class="crypto-grid" rowHeight="60"
+        [columnDefs]="columnDefs" 
+        [animateRows]="true"
+        [getRowNodeId]="getRowNodeId" 
+        (gridReady)="onGridReady($event)">
     </ag-grid-angular>
 </div>
