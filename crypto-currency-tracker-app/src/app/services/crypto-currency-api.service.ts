@@ -24,6 +24,7 @@ export type SymbolCode = string;
 export interface CryptoCurrency {
   id: number;
   symbol: SymbolCode;
+  fullName: string;
   url: string;
   imageUrl: string;
 }
@@ -74,6 +75,7 @@ export class CryptoCurrencyApiService {
           response.Data.map(data => ({
             id: data.CoinInfo.Id,
             symbol: data.CoinInfo.Name,
+            fullName: data.CoinInfo.FullName,
             url: data.CoinInfo.Url,
             imageUrl: `https://www.cryptocompare.com${data.CoinInfo.ImageUrl}`
           }))

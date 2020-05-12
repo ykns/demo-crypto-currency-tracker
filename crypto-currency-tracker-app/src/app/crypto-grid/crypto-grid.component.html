@@ -1,0 +1,11 @@
+<div class='root'>
+    <button (click)="onClick()">Watch</button>
+    <ag-grid-angular style="width: 900px; height: 500px;" 
+                    class="ag-theme-balham-dark" 
+                    rowHeight="50"
+                    [rowData]="cryptoCurrenciesWithPrice"
+                    [columnDefs]="columnDefs"
+                    [animateRows]="true"
+                    [getRowNodeId]="getRowNodeId">              
+    </ag-grid-angular>
+</div>

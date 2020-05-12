@@ -7,11 +7,13 @@ import { AppComponent } from './app.component';
 import { AgGridModule } from 'ag-grid-angular';
 import { CryptoGridComponent } from './crypto-grid/crypto-grid.component';
 import { CryptoCurrencyApiService } from './services/crypto-currency-api.service';
+import { ImageCellComponent } from './image-cell/image-cell.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    CryptoGridComponent
+    CryptoGridComponent,
+    ImageCellComponent
   ],
   imports: [
     BrowserModule,
