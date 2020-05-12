@@ -8,6 +8,7 @@ import { AgGridModule } from 'ag-grid-angular';
 import { CryptoGridComponent } from './crypto-grid/crypto-grid.component';
 import { CryptoCurrencyApiService } from './services/crypto-currency-api.service';
 import { ImageCellComponent } from './image-cell/image-cell.component';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import { ImageCellComponent } from './image-cell/image-cell.component';
     BrowserModule,
     AgGridModule.withComponents([]),
     HttpClientModule,
-    AppRoutingModule
+    AppRoutingModule,
+    FormsModule
   ],
   providers: [CryptoCurrencyApiService],
   bootstrap: [AppComponent]

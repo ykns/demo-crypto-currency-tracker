@@ -58,6 +58,10 @@ export class CryptoGridComponent implements OnInit, OnDestroy {
     this.setupPriceUpdatesForGridAndStart();
   }
 
+  onSelectFiatCurrencySymbol() {
+    this.setupPriceUpdatesForGridAndStart();
+  }
+
   setupPriceUpdatesForGridAndStart() {
     if (this.existingPriceSubscription) {
       this.existingPriceSubscription.unsubscribe();
