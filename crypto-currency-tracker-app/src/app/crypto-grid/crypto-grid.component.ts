@@ -3,7 +3,7 @@ import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/co
 import { CryptoCurrencyApiService, SymbolCode, CryptoCurrency } from '../services/crypto-currency-api.service';
 import { ImageCellComponent } from '../image-cell/image-cell.component';
 import { Subscription } from 'rxjs';
-import { CryptoCurrencyWebSocketService } from '../crypto-currency-websocket.service';
+import { CryptoCurrencyWebSocketService } from '../services/crypto-currency-websocket.service';
 
 @Component({
   selector: 'app-crypto-grid',
@@ -53,16 +53,9 @@ export class CryptoGridComponent implements OnInit, OnDestroy {
     this.getTopCryptoCurrencies();
   }
 
-  private getTopCryptoCurrencies() {
-    this.cryptoCurrencyApiService.getTopCryptoCurrenciesBy24HourVolume(this.selectedFiatCurrencySymbol, this.maxNumberOfCoins).subscribe(cryptoCurrencies => {
-      this.cryptoCurrencies = cryptoCurrencies;
-      this.symbolToCoinInfosMap = new Map(this.cryptoCurrencies.map(_ => [_.symbol, _]));
-    });
   onGridReady(params) {
     this.gridOptions = params.api;
     this.setupPriceUpdatesForGridAndStart();
-  }
-
   }
 
   setupPriceUpdatesForGridAndStart() {
