@@ -1,14 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 
-import { CryptoCurrencyApiService, SymbolCode, CryptoCurrency, CurrencyExchangeRate } from '../services/crypto-currency-api.service';
+import { CryptoCurrencyApiService, SymbolCode, CryptoCurrency } from '../services/crypto-currency-api.service';
 import { ImageCellComponent } from '../image-cell/image-cell.component';
+import { Subscription } from 'rxjs';
+import { CryptoCurrencyWebSocketService } from '../crypto-currency-websocket.service';
 
 @Component({
   selector: 'app-crypto-grid',
   templateUrl: './crypto-grid.component.html',
   styleUrls: ['./crypto-grid.component.scss']
 })
-export class CryptoGridComponent implements OnInit {
+export class CryptoGridComponent implements OnInit, OnDestroy {
   columnDefs = [
     {
       headerName: 'No.',
@@ -28,6 +30,9 @@ export class CryptoGridComponent implements OnInit {
     { headerName: 'Price', headerClass: 'cell-right', field: 'price', cellClass: 'cell-right', valueFormatter: ({ value }) => value.toFixed(2), width: 100 },
   ];
 
+  private gridOptions;
+
+  private symbolToCryptoCurrencies: Map<SymbolCode, any>;
   // limit to 20 coins due to max length limit imposed by crypto-compare's API
   private readonly maxNumberOfCoins = 20;
   // TODO consider finding a suitable API to provide this
@@ -35,19 +40,16 @@ export class CryptoGridComponent implements OnInit {
 
   public selectedFiatCurrencySymbol: SymbolCode;
 
-  public cryptoCurrencies: CryptoCurrency[];
   public selectedCryptoCurrency: CryptoCurrency;
-  private currencyExchangeRates: CurrencyExchangeRate[];
-  private symbolToCoinInfosMap: Map<SymbolCode, CryptoCurrency>;
 
-  public cryptoCurrenciesWithPrice: (CryptoCurrency & { price: number })[];
+  private existingPriceSubscription: Subscription;
 
   public getRowNodeId(data) {
     return data.id;
   }
 
-  constructor(private cryptoCurrencyApiService: CryptoCurrencyApiService) {
-    this.selectedFiatCurrencySymbol = this.fiatCurrencySymbol[0];
+  constructor(private cryptoCurrencyApiService: CryptoCurrencyApiService, private cryptoCurrencyWebSocketService: CryptoCurrencyWebSocketService) {
+    this.selectedFiatCurrencySymbol = this.fiatCurrencySymbols[0];
     this.getTopCryptoCurrencies();
   }
 
@@ -56,24 +58,39 @@ export class CryptoGridComponent implements OnInit {
       this.cryptoCurrencies = cryptoCurrencies;
       this.symbolToCoinInfosMap = new Map(this.cryptoCurrencies.map(_ => [_.symbol, _]));
     });
+  onGridReady(params) {
+    this.gridOptions = params.api;
+    this.setupPriceUpdatesForGridAndStart();
   }
 
-  onClick() {
-    this.getCryptoCurrenciesExchangeRates(this.fiatCurrencySymbol[0]);
   }
 
-  getCryptoCurrenciesExchangeRates(compareToCurrencySymbol: SymbolCode): void {
-    this.cryptoCurrencyApiService.getCryptoCurrenciesExchangeRates(compareToCurrencySymbol, this.cryptoCurrencies.map(_ => _.symbol))
-      .subscribe(currencyExchangeRates => {
-        this.currencyExchangeRates = currencyExchangeRates;
-        this.cryptoCurrenciesWithPrice = this.currencyExchangeRates.map(_ => ({
-          ...this.symbolToCoinInfosMap.get(_.symbol),
-          price: 1 / (_.exchangeRate)
-        }));
-      });
+  setupPriceUpdatesForGridAndStart() {
+    if (this.existingPriceSubscription) {
+      this.existingPriceSubscription.unsubscribe();
+    }
+    const cryptoCurrenciesWithInitialZeroPrice = [...this.symbolToCryptoCurrencies.values()].map(cryptoCurrency => ({ ...cryptoCurrency, price: 0 }));
+    this.gridOptions.setRowData(cryptoCurrenciesWithInitialZeroPrice);
+    this.existingPriceSubscription = this.cryptoCurrencyWebSocketService.priceUpdates$.subscribe(priceUpdate => {
+      console.log(`priceUpdate: from ${priceUpdate.fromSymbol} to ${priceUpdate.toSymbol} price: ${priceUpdate.price}`);
+      const cryptoCurrencyWithPriceUpdate = { ...this.symbolToCryptoCurrencies.get(priceUpdate.fromSymbol), price: priceUpdate.price };
+      const rowNode = this.gridOptions.getRowNode(cryptoCurrencyWithPriceUpdate.id);
+      rowNode.setDataValue('price', priceUpdate.price);
+    });
+    this.cryptoCurrencyWebSocketService.connect();
+    this.cryptoCurrencyWebSocketService.configureListenersForPriceUpdates([...this.symbolToCryptoCurrencies.keys()], this.selectedFiatCurrencySymbol);
+  }
+
+  private getTopCryptoCurrencies() {
+    this.cryptoCurrencyApiService.getTopCryptoCurrenciesBy24HourVolume(this.selectedFiatCurrencySymbol, this.maxNumberOfCoins).subscribe(cryptoCurrencies => {
+      this.symbolToCryptoCurrencies = new Map(cryptoCurrencies.map(cryptoCurrency => [cryptoCurrency.symbol, { ...cryptoCurrency }]));
+    });
   }
 
   ngOnInit(): void {
   }
 
+  ngOnDestroy(): void {
+    this.cryptoCurrencyWebSocketService.disconnect();
+  }
 }
