@@ -4,6 +4,7 @@ import { CryptoCurrencyApiService, SymbolCode, CryptoCurrency } from '../service
 import { ImageCellComponent } from '../image-cell/image-cell.component';
 import { Subscription } from 'rxjs';
 import { CryptoCurrencyWebSocketService } from '../services/crypto-currency-websocket.service';
+import { SelectHeaderComponent } from '../select-header/select-header.component';
 
 @Component({
   selector: 'app-crypto-grid',
@@ -30,6 +31,8 @@ export class CryptoGridComponent implements OnInit, OnDestroy {
     {
       headerName: 'Price',
       headerClass: 'cell-right',
+      headerComponentFramework: SelectHeaderComponent,
+      headerComponentParams: { items: this.fiatCurrencySymbols, onSelectedItem: (selectedItem: SymbolCode) => this.setupPriceUpdatesForGridAndStart(selectedItem) },
       field: 'price',
       cellClass: 'cell-right',
       width: 180,

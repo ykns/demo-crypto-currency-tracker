@@ -8,20 +8,20 @@ import { AgGridModule } from 'ag-grid-angular';
 import { CryptoGridComponent } from './crypto-grid/crypto-grid.component';
 import { CryptoCurrencyApiService } from './services/crypto-currency-api.service';
 import { ImageCellComponent } from './image-cell/image-cell.component';
-import { FormsModule } from '@angular/forms';
+import { SelectHeaderComponent } from './select-header/select-header.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     CryptoGridComponent,
-    ImageCellComponent
+    ImageCellComponent,
+    SelectHeaderComponent
   ],
   imports: [
     BrowserModule,
     AgGridModule.withComponents([]),
     HttpClientModule,
-    AppRoutingModule,
-    FormsModule
+    AppRoutingModule
   ],
   providers: [CryptoCurrencyApiService],
   bootstrap: [AppComponent]
