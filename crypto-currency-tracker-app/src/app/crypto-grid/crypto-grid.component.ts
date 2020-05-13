@@ -11,7 +11,22 @@ import { SelectHeaderComponent } from '../select-header/select-header.component'
   templateUrl: './crypto-grid.component.html',
   styleUrls: ['./crypto-grid.component.scss']
 })
-export class CryptoGridComponent implements OnInit, OnDestroy {
+export class CryptoGridComponent implements OnDestroy {
+
+  constructor(private cryptoCurrencyApiService: CryptoCurrencyApiService, private cryptoCurrencyWebSocketService: CryptoCurrencyWebSocketService) { }
+
+  private gridOptions;
+
+  private symbolToCryptoCurrencies: Map<SymbolCode, any>;
+  // limit to 20 coins due to max length limit imposed by crypto-compare's API
+  private readonly maxNumberOfCoins = 20;
+  // TODO consider finding a suitable API to provide this
+  public fiatCurrencySymbols: SymbolCode[] = ['EUR', 'GBP', 'USD'];
+
+  public selectedCryptoCurrency: CryptoCurrency;
+
+  private existingPriceSubscription: Subscription;
+
   columnDefs = [
     {
       headerName: 'No.',
@@ -41,61 +56,39 @@ export class CryptoGridComponent implements OnInit, OnDestroy {
     },
   ];
 
-  private gridOptions;
-
-  private symbolToCryptoCurrencies: Map<SymbolCode, any>;
-  // limit to 20 coins due to max length limit imposed by crypto-compare's API
-  private readonly maxNumberOfCoins = 20;
-  // TODO consider finding a suitable API to provide this
-  public fiatCurrencySymbols: SymbolCode[] = ['EUR', 'GBP', 'USD'];
-
-  public selectedFiatCurrencySymbol: SymbolCode;
-
-  public selectedCryptoCurrency: CryptoCurrency;
-
-  private existingPriceSubscription: Subscription;
-
   public getRowNodeId(data) {
     return data.id;
   }
 
-  constructor(private cryptoCurrencyApiService: CryptoCurrencyApiService, private cryptoCurrencyWebSocketService: CryptoCurrencyWebSocketService) {
-    this.selectedFiatCurrencySymbol = this.fiatCurrencySymbols[0];
-    this.getTopCryptoCurrencies();
-  }
-
-  onGridReady(params) {
+  async onGridReady(params: { api: any; }) {
     this.gridOptions = params.api;
-    this.setupPriceUpdatesForGridAndStart();
+    await this.getTopCryptoCurrencies(this.fiatCurrencySymbols[0]);
+    this.setupPriceUpdatesForGridAndStart(this.fiatCurrencySymbols[0]);
   }
 
-  onSelectFiatCurrencySymbol() {
-    this.setupPriceUpdatesForGridAndStart();
+  onSelectFiatCurrencySymbol(selectedFiatCurrencySymbol: SymbolCode) {
+    this.setupPriceUpdatesForGridAndStart(selectedFiatCurrencySymbol);
   }
 
-  setupPriceUpdatesForGridAndStart() {
+  setupPriceUpdatesForGridAndStart(selectedFiatCurrencySymbol: SymbolCode) {
     if (this.existingPriceSubscription) {
       this.existingPriceSubscription.unsubscribe();
     }
+
     const cryptoCurrenciesWithInitialZeroPrice = [...this.symbolToCryptoCurrencies.values()].map(cryptoCurrency => ({ ...cryptoCurrency, price: 0 }));
     this.gridOptions.setRowData(cryptoCurrenciesWithInitialZeroPrice);
     this.existingPriceSubscription = this.cryptoCurrencyWebSocketService.priceUpdates$.subscribe(priceUpdate => {
-      console.log(`priceUpdate: from ${priceUpdate.fromSymbol} to ${priceUpdate.toSymbol} price: ${priceUpdate.price}`);
       const cryptoCurrencyWithPriceUpdate = { ...this.symbolToCryptoCurrencies.get(priceUpdate.fromSymbol), price: priceUpdate.price };
       const rowNode = this.gridOptions.getRowNode(cryptoCurrencyWithPriceUpdate.id);
       rowNode.setDataValue('price', priceUpdate.price);
     });
     this.cryptoCurrencyWebSocketService.connect();
-    this.cryptoCurrencyWebSocketService.configureListenersForPriceUpdates([...this.symbolToCryptoCurrencies.keys()], this.selectedFiatCurrencySymbol);
+    this.cryptoCurrencyWebSocketService.configureListenersForPriceUpdates([...this.symbolToCryptoCurrencies.keys()], selectedFiatCurrencySymbol);
   }
 
-  private getTopCryptoCurrencies() {
-    this.cryptoCurrencyApiService.getTopCryptoCurrenciesBy24HourVolume(this.selectedFiatCurrencySymbol, this.maxNumberOfCoins).subscribe(cryptoCurrencies => {
-      this.symbolToCryptoCurrencies = new Map(cryptoCurrencies.map(cryptoCurrency => [cryptoCurrency.symbol, { ...cryptoCurrency }]));
-    });
-  }
-
-  ngOnInit(): void {
+  private async getTopCryptoCurrencies(selectedFiatCurrencySymbol) {
+    const cryptoCurrencies = await this.cryptoCurrencyApiService.getTopCryptoCurrenciesBy24HourVolume(selectedFiatCurrencySymbol, this.maxNumberOfCoins).toPromise();
+    this.symbolToCryptoCurrencies = new Map(cryptoCurrencies.map(cryptoCurrency => [cryptoCurrency.symbol, { ...cryptoCurrency }]));
   }
 
   ngOnDestroy(): void {
